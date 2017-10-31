@@ -39,9 +39,9 @@ class TelecomBilling(models.Model):
         account = self.env['account.account'].search([('name', '=', 'Debtors Control Account')])
         tax = self.env['account.tax'].search([('name', '=', 'S')])
         journal = self.env['account.journal'].search([('code', '=', 'BNK1')])
-        filename = '/home/r/1.csv'
-        # filename = askopenfilename(initialdir=home)
-        # root.destroy()
+        # filename = '/home/r/1.csv'
+        filename = askopenfilename(initialdir=home)
+        root.destroy()
         with open(filename, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
             for ind, row in enumerate(spamreader):
