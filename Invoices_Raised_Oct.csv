@@ -1,0 +1,102 @@
+Invoice Number,Site Name,Account Number,Payment Method,Calls,Service Charges,Total (W/o VAT),VAT,Total,Period,Date
+51952,1st Airport Taxis/1st Airport Taxis,AIR0301,Cheque,0,40.99,40.99,8.2,49.19,Jul-17,01.01.17
+51953,1st Choice Private Hire (Uk) Ltd,1ST0511,Direct Debit,11.49,70.99,82.48,16.5,98.98,Jul-17,02.01.17
+51954,69ers Limited,69E2809,Cheque,12.76,282.5,295.26,59.05,354.31,Jul-17,03.01.17
+51955,A G C Telecom Ltd,AGC0704,Direct Debit,0.27,50,50.27,10.05,60.32,Jul-17,04.01.17
+51956,A S Excellence Solicitors,ASE1212,Direct Debit,0,63.09,63.09,12.62,75.71,Jul-17,05.01.17
+51957,A1 Cars Bedford Ltd,A1C1406,Direct Debit,26.7,125,151.7,30.34,182.04,Jul-17,06.01.17
+51958,A2B Tommyfield Cars,A2B2403,Direct Debit,24.86,113.98,138.84,27.77,166.61,Jul-17,07.01.17
+51959,Advance Taxis (Euro Cars),ADV2003,Direct Debit,14.44,213.98,228.42,45.68,274.1,Jul-17,08.01.17
+51960,Aero Cabs,ARO1811,Cheque,0.37,69,69.37,13.87,83.24,Jul-17,09.01.17
+51961,Alpha Cars Ltd,ALP1501,Direct Debit,0,51,51,10.2,61.2,Jul-17,10.01.17
+51962,Amber Cars,ABR2707,Direct Debit,0,15.2,15.2,3.04,18.24,Jul-17,11.01.17
+51963,Ansari Law Solicitors,ANS3105,Direct Debit,0.88,138.1,138.98,27.8,166.78,Jul-17,12.01.17
+51964,Arcade Taxis,ARC2003,Direct Debit,0,98.98,98.98,19.8,118.78,Jul-17,13.01.17
+51965,Bacup Taxis,BCP1204,Cheque,0.02,119.15,119.17,23.83,143,Jul-17,14.01.17
+51966,Beez Private Hire Ltd,BEZ0408,Cheque,0,83.02,83.02,16.6,99.62,Jul-17,15.01.17
+51967,Betty's Private Hire,BET0211,Direct Debit,34.51,286.85,321.36,64.27,385.63,Jul-17,16.01.17
+51968,Bingley Taxis Limited,BGY0304,Direct Debit,17.39,221.26,238.65,47.73,286.38,Jul-17,17.01.17
+51969,Bison Solutions Ltd,BIS0112,Direct Debit,0,74,74,14.8,88.8,Jul-17,18.01.17
+51970,BlueBank Solutions Ltd,SED1807,Direct Debit,0,519.99,519.99,104,623.99,Jul-17,19.01.17
+51971,Bright Associate Ltd,BRT0904,Direct Debit,71.63,191.79,263.42,52.68,316.1,Jul-17,20.01.17
+51972,Brownhill Private Hire,BRW2703,Direct Debit,0,159.99,159.99,32,191.99,Jul-17,21.01.17
+51973,Chadderton Cars,CHD3006,Direct Debit,0,110.9,110.9,22.18,133.08,Jul-17,22.01.17
+51974,Cheetah Minicabs,CHE2411,Direct Debit,0,120,120,24,144,Jul-17,23.01.17
+51975,City Lynx Taxis Barrow Ltd,CLT0308,Direct Debit,0,49,49,9.8,58.8,Jul-17,24.01.17
+51976,City Private Hire and Minibuses Ltd,CTY0204,Direct Debit,348.7,517.63,866.33,173.27,1039.6,Jul-17,25.01.17
+51977,Clock Cars,CLC1103,Direct Debit,0,125,125,25,150,Jul-17,26.01.17
+51978,Comms Source Ltd,CommsSource,Cheque,133.67,86.9,220.57,44.11,264.68,Jul-17,27.01.17
+51979,Creating Smiles,CRE2809,Direct Debit,0,15,15,3,18,Jul-17,28.01.17
+51980,Culimeta-Saveguard Limited,CLM0704,Direct Debit,85.15,119.6,204.75,40.95,245.7,Jul-17,29.01.17
+51981,Culloden Ltd,CUL1907,Direct Debit,3.01,85,88.01,17.6,105.61,Jul-17,30.01.17
+51982,Darul Ulooom Dawatul Imaan,DUD2807,Direct Debit,0,44.01,44.01,8.8,52.81,Jul-17,31.01.17
+51983,Diamond Facilities Support,DFS2603,Direct Debit,358.37,955.47,1313.84,262.77,1576.61,Jul-17,01.02.17
+51984,Dry Clean Only,DCO1511,Direct Debit,7.5,31.59,39.09,7.82,46.91,Jul-17,02.02.17
+51985,DTS Law Limited,DTS0411,Direct Debit,0,15,15,3,18,Jul-17,03.02.17
+51986,Eagle Taxis,EGL0409,Direct Debit,0,9.99,9.99,2,11.99,Jul-17,04.02.17
+51987,Eccleshill Premier Taxis,ECC0209,Direct Debit,57.04,454.26,511.3,102.26,613.56,Jul-17,05.02.17
+51988,Elite Automotive Ltd,ELI1403,Direct Debit,130.81,49.98,180.79,36.16,216.95,Jul-17,06.02.17
+51989,Elite Cars,ELT2003,Direct Debit,0,87.5,87.5,17.5,105,Jul-17,07.02.17
+51990,Elite Motors Group Ltd,EMG3103,Direct Debit,88.86,50.6,139.46,27.89,167.35,Jul-17,08.02.17
+51991,Elton Bullitt Taxis,ELT1702,Direct Debit,0,512.15,512.15,102.43,614.58,Jul-17,09.02.17
+51992,Embassy Cars,EMB0102,Direct Debit,0,19,19,3.8,22.8,Jul-17,10.02.17
+51993,Ezy Pick Ltd,EZP1406,Direct Debit,0.21,27.08,27.29,5.46,32.75,Jul-17,11.02.17
+51994,Falcon Taxis,FCN2110,Direct Debit,0,110,110,22,132,Jul-17,12.02.17
+51995,Fun Bikes Ltd,FUN2305,Direct Debit,45.22,130.5,175.72,35.14,210.86,Jul-17,13.02.17
+51996,Giant Leap Childcare and Learning Centre,GNT0703,Direct Debit,16.11,36,52.11,10.42,62.53,Jul-17,14.02.17
+51997,Goldline Cabs Associates Ltd,GOL2804,Direct Debit,0,49.95,49.95,9.99,59.94,Jul-17,15.02.17
+51998,Griffin Battery Centres,GRI0107,Direct Debit,8.07,185.2,193.27,38.65,231.92,Jul-17,16.02.17
+51999,Harpenden Taxis Ltd,HRP2406,Direct Debit,0,35,35,7,42,Jul-17,17.02.17
+52000,Hassy Taxis,HAS2305,Direct Debit,0,90.1,90.1,18.02,108.12,Jul-17,18.02.17
+52001,Herald Car Hire,HRL1910,Direct Debit,0,39.96,39.96,7.99,47.95,Jul-17,19.02.17
+52002,Ideal Properties (UK) Ltd,IDL0212,Direct Debit,8.62,86,94.62,18.92,113.54,Jul-17,20.02.17
+52003,J E Marlow & Sons,JEM2804,Direct Debit,57.38,324.77,382.15,76.43,458.58,Jul-17,21.02.17
+52004,Jeremias UK Limited,JMS1212,Direct Debit,0.71,80,80.71,16.14,96.85,Jul-17,22.02.17
+52005,Joseph Daniel Solicitors Ltd,JDS0307,Direct Debit,0,179.82,179.82,35.96,215.78,Jul-17,23.02.17
+52006,KAC Minicabs,KAC1005,Direct Debit,23.68,45,68.68,13.74,82.42,Jul-17,24.02.17
+52007,KB Cars Limited,KBC0102,Direct Debit,0,35,35,7,42,Jul-17,25.02.17
+52008,Local Cars Prestwich,LOC0905,Direct Debit,0,232.62,232.62,46.52,279.14,Jul-17,26.02.17
+52009,Madina Institute,MAD1111,Direct Debit,0,35,35,7,42,Jul-17,27.02.17
+52010,Madina Properties Ltd,MDN1204,Cheque,0,75.6,75.6,15.12,90.72,Jul-17,28.02.17
+52011,Marquis Private Hire,MRQ2707,Cheque,69.04,153.39,222.43,44.49,266.92,Jul-17,01.03.17
+52012,Max Cabs Ltd,MCL1408,Direct Debit,24.59,614.05,638.64,127.73,766.37,Jul-17,02.03.17
+52013,Meter Cars,MTR2909,Direct Debit,0,64.94,64.94,12.99,77.93,Jul-17,03.03.17
+52014,Middlesbrough Borough Cars Ltd(Binks),BMO1003,Direct Debit,4.18,140.2,144.38,28.88,173.26,Jul-17,04.03.17
+52015,Monaco Hire Assist Ltd,MHA0407,Cheque,0,106.98,106.98,21.4,128.38,Jul-17,05.03.17
+52016,Motorsure Ltd,MTS2808,Direct Debit,2.59,125,127.59,25.52,153.11,Jul-17,06.03.17
+52017,Mr Ebrahim Brepotra,EBM1108,Cheque,5.93,11.02,16.95,3.39,20.34,Jul-17,07.03.17
+52018,MWG Solicitors,MWG1910,Direct Debit,0.2,130.6,130.8,26.16,156.96,Jul-17,08.03.17
+52019,Network Cars (Village Cars),NTW1711,Direct Debit,0,134.89,134.89,26.98,161.87,Jul-17,09.03.17
+52020,New Century Cars,NSC2907,Direct Debit,11.66,205,216.66,43.33,259.99,Jul-17,10.03.17
+52021,Nottingham Cars Ltd,NTC0704,Direct Debit,0,49,49,9.8,58.8,Jul-17,11.03.17
+52022,Ontime Cars,ONT2004,Direct Debit,0,107.41,107.41,21.48,128.89,Jul-17,12.03.17
+52023,ORION,CommsSou,Cheque,0,0,0,0,0,Jul-17,13.03.17
+52024,Pal Cars,PAL2101,Direct Debit,0,206.99,206.99,41.4,248.39,Jul-17,14.03.17
+52025,Premier Taxis Kettering,PRM1404,Direct Debit,1.54,29,30.54,6.11,36.65,Jul-17,15.03.17
+52026,Pride Cars,PRD0811,Direct Debit,0,77.16,77.16,15.43,92.59,Jul-17,16.03.17
+52027,Putney Cars,PUT0905,Cheque,0,24,24,4.8,28.8,Jul-17,17.03.17
+52028,Rapid Private Hire,RPH0408,Direct Debit,0,43.5,43.5,8.7,52.2,Jul-17,18.03.17
+52029,Response Taxis,RES1207,Direct Debit,0,50.2,50.2,10.04,60.24,Jul-17,19.03.17
+52030,S&D Private Hire,SND2202,Direct Debit,0.04,107.5,107.54,21.51,129.05,Jul-17,20.03.17
+52031,Scotts Private Hire Taxis,SCT2010,Direct Debit,13.28,1024.51,1037.79,207.56,1245.35,Jul-17,21.03.17
+52032,Scotts Private Hire Taxis ( Ekko Private Hire ),SCT2010,Direct Debit,0,168,168,33.6,201.6,Jul-17,22.03.17
+52033,SK Immigration Services Ltd,SKI0312,Direct Debit,0.4,15,15.4,3.08,18.48,Jul-17,23.03.17
+52034,Sovereign Cars,SOV2005,Direct Debit,37.81,40,77.81,15.56,93.37,Jul-17,24.03.17
+52035,Stanley Travel North East Ltd/Coach Office,STN1208,Direct Debit,6.89,305.19,312.08,62.42,374.5,Jul-17,25.03.17
+52036,Star Cars - Chorley,STA2706,Cheque,15.38,150,165.38,33.08,198.46,Jul-17,26.03.17
+52037,Star Cars - Rawtenstall,STA0112,Direct Debit,12.49,144.1,156.59,31.32,187.91,Jul-17,27.03.17
+52038,Stepps Radio Cars,STP0809,Direct Debit,14.23,117.99,132.22,26.44,158.66,Jul-17,28.03.17
+52039,Swift Taxis,SWT2012,Direct Debit,0,60,60,12,72,Jul-17,29.03.17
+52040,Swiftline Star Taxis,SWF1006,Direct Debit,0.05,339.78,339.83,67.97,407.8,Jul-17,30.03.17
+52041,Thatched Cars,THA0111,Direct Debit,0,102.5,102.5,20.5,123,Jul-17,31.03.17
+52042,Thornton Lodge Surgery,TLS1711,Direct Debit,0,128.46,128.46,25.69,154.15,Jul-17,01.04.17
+52043,Tiger Cars Clitheroe Limited,TGR2407,Direct Debit,0,135.98,135.98,27.2,163.18,Jul-17,02.04.17
+52044,Town Gate Cars,TWN0103,Cheque,0,95.99,95.99,19.2,115.19,Jul-17,03.04.17
+52045,Triple One Cars,,Cheque,0.02,0,0.02,0,0.02,Jul-17,04.04.17
+52046,Uber Taxis North West Ltd,UBT1505,Direct Debit,0,89.96,89.96,17.99,107.95,Jul-17,05.04.17
+52047,Viceroy Law Limited,VCL0608,Direct Debit,16.13,146.31,162.44,32.49,194.93,Jul-17,06.04.17
+52048,Village Cars/Village Cars-Accrington,VC1108,Direct Debit,0,132.36,132.36,26.47,158.83,Jul-17,07.04.17
+52049,Village Cars (Oldham) Ltd,VIL3103,Direct Debit,1.61,140.6,142.21,28.44,170.65,Jul-17,08.04.17
+52050,Village Cleaners,DVC2008,Direct Debit,3.09,135.25,138.34,27.67,166.01,Jul-17,09.04.17
+52051,Village Pizzeria & Kebab,VLP0709,Cheque,0.15,49.58,49.73,9.95,59.68,Jul-17,10.04.17
+52052,Yellow Cars Barnoldswick Ltd,YLW2710,Direct Debit,0.76,182.53,183.29,36.66,219.95,Jul-17,11.04.17

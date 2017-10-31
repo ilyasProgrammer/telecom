@@ -1,5 +1,5 @@
 [options]
-addons_path = /pd/invoice_copy,/pd/odoo10/addons,/pd/apps/odoo_modules
+addons_path = /pd/odoo10/addons,/pd/telecom
 db_template = template1
 db_host = False
 db_maxconn = 64

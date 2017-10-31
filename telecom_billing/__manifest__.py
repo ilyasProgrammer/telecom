@@ -5,7 +5,7 @@
     'version': '1.1',
     'category': 'custom',
     'sequence': 200,
-    'summary': 'telecom_billing',
+    'summary': 'Read requirements.txt please',
     'description': """
     """,
     'website': 'https://www.odoo.com/page/employees',
@@ -13,7 +13,9 @@
     ],
     'depends': [
         'sale',
+        'account',
     ],
+    'external_dependencies': {"python": ['Tkinter']},
     'data': [
         'views/views.xml'
     ],

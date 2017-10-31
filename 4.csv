@@ -1,0 +1,2 @@
+date_invoice,Invoice ref,partner_id,name,payment_method,Account,Invoice Lines / price_unit,Invoice Lines/product_id,journal_id/Database ID, Invoice Lines / Account, Invoice Lines / Description, is_billing, company_id/id, currency_id/id
+2017-10-01,sss,1st Airport Taxis,Jul-17,cheque,Debtors Control Account,777,Electricity Bill,1,Sales Tax Control Account,imported,true,base.main_company,base.GBP
