@@ -45,40 +45,40 @@ class TelecomBilling(models.Model):
                     continue
                 found = invoice.search([('invoice_ref', '=', row[0].strip())], limit=1)
                 if len(found):
-                    self.channel_ids += found
-                else:
-                    partner_name = row[1].strip()
-                    partner = self.env['res.partner'].search([('name', '=', partner_name)])
-                    if not partner:
-                        _logger.error("Partner not found: %s", partner_name)
-                        continue
-                    if len(partner) > 1:
-                        _logger.error("More than one partner with same name: %s", partner_name)
-                        continue
-                    product = self.env['product.product'].search([('name', '=', 'Electricity Bill')])
-                    if not product:
-                        _logger.error("Product not found: %s", 'Electricity Bill')
-                        continue
+                    _logger.error("Found existing old billing records: %s", found.invoice_ref)
+                    continue
+                partner_name = row[1].strip()
+                partner = self.env['res.partner'].search([('name', '=', partner_name)])
+                if not partner:
+                    _logger.error("Partner not found: %s", partner_name)
+                    continue
+                if len(partner) > 1:
+                    _logger.error("More than one partner with same name: %s", partner_name)
+                    continue
+                product = self.env['product.product'].search([('name', '=', 'Electricity Bill')])
+                if not product:
+                    _logger.error("Product not found: %s", 'Electricity Bill')
+                    continue
 
-                    vals = {'partner_id': partner.id,
-                            'invoice_ref': row[0].strip(),
-                            'payment_method': row[3].strip(),
-                            'account_id': account.id,
-                            'name': row[9].strip(),
-                            'date_invoice': datetime.strptime(row[10].strip(), '%d.%m.%y'),
-                            'is_billing': True,
-                            }
-                    new_invoice = invoice.create(vals)
-                    _logger.info("New invoice created: %s", row[0].strip())
-                    line_vals = {'product_id': product.id,
-                                 'account_id': line_account.id,
-                                 'price_unit': float(row[5].strip()) - float(row[4].strip()),
-                                 'name': 'imported',
-                                 'partner_id': partner.id,
-                                 'invoice_line_tax_ids': [(6, 0, [tax.id])],
-                                 }
-                    new_invoice.write({'invoice_line_ids': [(0, 0, line_vals)]})
-                    new_invoice.compute_taxes()
+                vals = {'partner_id': partner.id,
+                        'invoice_ref': row[0].strip(),
+                        'payment_method': row[3].strip(),
+                        'account_id': account.id,
+                        'name': row[9].strip(),
+                        'date_invoice': datetime.strptime(row[10].strip(), '%d.%m.%y'),
+                        'is_billing': True,
+                        }
+                new_invoice = invoice.create(vals)
+                _logger.info("New invoice created: %s", row[0].strip())
+                line_vals = {'product_id': product.id,
+                             'account_id': line_account.id,
+                             'price_unit': float(row[5].strip()) - float(row[4].strip()),
+                             'name': 'imported',
+                             'partner_id': partner.id,
+                             'invoice_line_tax_ids': [(6, 0, [tax.id])],
+                             }
+                new_invoice.write({'invoice_line_ids': [(0, 0, line_vals)]})
+                new_invoice.compute_taxes()
 
 
 class TelecomBillingLine(models.Model):
