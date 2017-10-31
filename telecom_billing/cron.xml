@@ -9,7 +9,7 @@
         <field name="numbercall">-1</field>
         <field name="priority">500</field>
         <field name="doall" eval="False"/>
-        <field name="model" eval="'account.invoice'"/>
+        <field name="model" eval="'import.billing'"/>
         <field name="function" eval="'import_billings'"/>
         <field name="args" eval="'()'"/>
     </record>
