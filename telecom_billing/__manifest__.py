@@ -17,7 +17,8 @@
     ],
     'external_dependencies': {"python": ['Tkinter']},
     'data': [
-        'views/views.xml'
+        'views/views.xml',
+        'cron.xml'
     ],
     'demo': [
     ],

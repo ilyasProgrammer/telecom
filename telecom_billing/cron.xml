@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data>
+    <record model="ir.cron" id="ir_cron_import_billings">
+        <field name="name">telecom_billing</field>
+        <field eval="False" name="active" />
+        <field name="interval_number">24</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+        <field name="priority">500</field>
+        <field name="doall" eval="False"/>
+        <field name="model" eval="'account.invoice'"/>
+        <field name="function" eval="'import_billings'"/>
+        <field name="args" eval="'()'"/>
+    </record>
+</data>
+</openerp>
