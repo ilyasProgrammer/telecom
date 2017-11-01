@@ -5,6 +5,14 @@ import csv
 from StringIO import StringIO
 from datetime import datetime
 from odoo import api, fields, models, _
+import werkzeug
+import cgi
+import json
+from odoo import http
+from odoo.http import request
+from odoo.addons.base_import.controllers.main import ImportController
+from odoo.exceptions import Warning
+from odoo.http import Response
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -25,17 +33,8 @@ class TelecomBilling(models.Model):
         ('invoice_ref_unique', 'UNIQUE(invoice_ref)', 'A invoice_ref must be unique!'),
     ]
 
-
-class TelecomBillingLine(models.Model):
-    _inherit = 'account.invoice.line'
-    default_code = fields.Char(related='product_id.default_code')
-
-
-class AttachementMode(models.Model):
-    _inherit = 'ir.attachment'
-
     @api.one
-    def import_billings(self):
+    def import_billings(self, content):
         invoice = self.env['account.invoice']
         payment = self.env['account.payment']
         payment_method_manual_in = self.env.ref("account.account_payment_method_manual_in")
@@ -44,7 +43,6 @@ class AttachementMode(models.Model):
         account = self.env['account.account'].search([('name', '=', 'Debtors Control Account')])
         tax = self.env['account.tax'].search([('name', '=', 'S')])[0]
         journal = self.env['account.journal'].search([('code', '=', 'BNK1')])
-        content = self.index_content
         # filename = '/home/r/1.csv'
         spamreader = csv.reader(StringIO(content), delimiter=',', quotechar='"')
         for ind, row in enumerate(spamreader):
@@ -66,7 +64,8 @@ class AttachementMode(models.Model):
             if not product:
                 _logger.error("Product not found: %s", 'Electricity Bill')
                 continue
-            date = datetime.strptime(row[10].strip(), '%d.%m.%y')
+            # date = datetime.strptime(row[10].strip(), '%d.%m.%y')
+            date = fields.Datetime.now()
             vals = {'partner_id': partner.id,
                     'invoice_ref': row[0].strip(),
                     'payment_method': row[3].strip(),
@@ -88,7 +87,7 @@ class AttachementMode(models.Model):
             new_invoice.write({'invoice_line_ids': [(0, 0, line_vals)]})
             new_invoice.compute_taxes()
             # Register payment
-            if int(row[11]):
+            if int(row[10]):
                 new_invoice.action_invoice_open()
                 _logger.info("Validated invoice: %s", new_invoice.invoice_ref)
                 ctx = {'active_model': 'account.invoice', 'active_ids': [new_invoice.id]}
@@ -125,3 +124,23 @@ class AttachementMode(models.Model):
         amount_in_widget = currency_id and amount_currency or amount
         bank_stmt_line.process_reconciliation(payment_aml_rec=liquidity_aml)
         return bank_stmt
+
+
+class TelecomBillingLine(models.Model):
+    _inherit = 'account.invoice.line'
+    default_code = fields.Char(related='product_id.default_code')
+
+
+class Extension(ImportController):
+    @http.route()
+    def set_file(self, file, import_id, jsonp='callback'):
+        import_id = int(import_id)
+        written = request.env['base_import.import'].browse(import_id).write({
+            'file': file.read(),
+            'file_name': file.filename,
+            'file_type': file.content_type,
+        })
+        rec = request.env['base_import.import'].browse(import_id)
+        if rec.res_model == 'account.invoice':
+            request.env['account.invoice'].search([])[0].import_billings(rec.file)
+        return 'window.top.%s(%s)' % (cgi.escape(jsonp), json.dumps({'result': written}))
