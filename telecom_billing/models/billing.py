@@ -174,6 +174,8 @@ class Extension(models.TransientModel):
 
     @api.multi
     def parse_preview(self, options, count=10):
+        if self.res_model != 'account.invoice':
+            return super(Extension, self).parse_preview(options, count)
         res = self.env['account.invoice'].search([])[0].import_billings(self.file)
         if str(res) == '[[]]':
             res = "Everything ok"
