@@ -13,6 +13,8 @@ from odoo.http import request
 from odoo.addons.base_import.controllers.main import ImportController
 from odoo.exceptions import Warning
 from odoo.http import Response
+import itertools
+import operator
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -22,7 +24,8 @@ class TelecomBilling(models.Model):
     _inherit = 'account.invoice'
     is_billing = fields.Boolean('Is billing', default=False)
     invoice_ref = fields.Char(string='Invoice ref')
-    account_no = fields.Char(readonly=True)
+    # account_no = fields.Char(related='partner_id.x_account_no')
+    account_no = fields.Char()
     payment_method = fields.Selection([('Cheque', 'Cheque'),
                                        ('Direct Debit', 'Direct Debit'),
                                        ('Card Payment', 'Card Payment'),
@@ -35,6 +38,7 @@ class TelecomBilling(models.Model):
 
     @api.one
     def import_billings(self, content):
+        res = []
         invoice = self.env['account.invoice']
         payment = self.env['account.payment']
         payment_method_manual_in = self.env.ref("account.account_payment_method_manual_in")
@@ -44,26 +48,16 @@ class TelecomBilling(models.Model):
         tax = self.env['account.tax'].search([('name', '=', 'S')])[0]
         journal = self.env['account.journal'].search([('code', '=', 'BNK1')])
         # filename = '/home/r/1.csv'
+        errors = self.check_rows(content)
+        if len(errors):
+            return errors
         spamreader = csv.reader(StringIO(content), delimiter=',', quotechar='"')
         for ind, row in enumerate(spamreader):
             if ind == 0:
                 continue
-            found = invoice.search([('invoice_ref', '=', row[0].strip())], limit=1)
-            if len(found):
-                _logger.error("Found existing old billing records: %s", found.invoice_ref)
-                continue
             partner_name = row[1].strip()
             partner = self.env['res.partner'].search([('name', '=', partner_name)])
-            if not partner:
-                _logger.error("Partner not found: %s", partner_name)
-                continue
-            if len(partner) > 1:
-                _logger.error("More than one partner with same name: %s", partner_name)
-                continue
             product = self.env['product.product'].search([('name', '=', 'Electricity Bill')])
-            if not product:
-                _logger.error("Product not found: %s", 'Electricity Bill')
-                continue
             # date = datetime.strptime(row[10].strip(), '%d.%m.%y')
             date = fields.Datetime.now()
             vals = {'partner_id': partner.id,
@@ -102,6 +96,50 @@ class TelecomBilling(models.Model):
                 liquidity_aml = payments.move_line_ids.filtered(lambda r: r.user_type_id.type == 'liquidity')
                 bank_statement = self.reconcile(liquidity_aml, date, partner, liquidity_aml.debit, 0, False)
                 _logger.info("Bank statement registered for invoice: %s", new_invoice.invoice_ref)
+        return res
+
+    def check_rows(self, rows):
+        r1 = csv.reader(StringIO(rows), delimiter=',', quotechar='"')
+        res = []
+        ref_numbers = set()
+        duplicated_refs = []
+        for row in r1:
+            if row[0] not in ref_numbers:
+                ref_numbers.add(row[0])
+            else:
+                duplicated_refs.append(row[0])
+        if len(duplicated_refs):
+            res.append('duplicated refs:' + str(duplicated_refs))
+        invoice = self.env['account.invoice']
+        r2 = csv.reader(StringIO(rows), delimiter=',', quotechar='"')
+        for ind, row in enumerate(r2):
+            if ind == 0:
+                continue
+            found = invoice.search([('invoice_ref', '=', row[0].strip())], limit=1)
+            if len(found):
+                msg = "Found existing old billing records: %s" % found.invoice_ref
+                _logger.error(msg)
+                res.append(msg)
+                return res
+            partner_name = row[1].strip()
+            partner = self.env['res.partner'].search([('name', '=', partner_name)])
+            if not partner:
+                msg = "Partner not found: %s" % partner_name
+                _logger.error(msg)
+                res.append(msg)
+                return res
+            if len(partner) > 1:
+                msg = "More than one partner with same name: %s" % partner_name
+                _logger.error(msg)
+                res.append(msg)
+                return res
+            product = self.env['product.product'].search([('name', '=', 'Electricity Bill')])
+            if not product:
+                msg = "Product not found: %s" % 'Electricity Bill'
+                _logger.error(msg)
+                res.append(msg)
+                return res
+        return res
 
     def reconcile(self, liquidity_aml, date, partner, amount=0.0, amount_currency=0.0, currency_id=None):
         """ Reconcile a journal entry corresponding to a payment with its bank statement line """
@@ -131,16 +169,15 @@ class TelecomBillingLine(models.Model):
     default_code = fields.Char(related='product_id.default_code')
 
 
-class Extension(ImportController):
-    @http.route()
-    def set_file(self, file, import_id, jsonp='callback'):
-        import_id = int(import_id)
-        written = request.env['base_import.import'].browse(import_id).write({
-            'file': file.read(),
-            'file_name': file.filename,
-            'file_type': file.content_type,
-        })
-        rec = request.env['base_import.import'].browse(import_id)
-        if rec.res_model == 'account.invoice':
-            request.env['account.invoice'].search([])[0].import_billings(rec.file)
-        return 'window.top.%s(%s)' % (cgi.escape(jsonp), json.dumps({'result': written}))
+class Extension(models.TransientModel):
+    _inherit = 'base_import.import'
+
+    @api.multi
+    def parse_preview(self, options, count=10):
+        res = self.env['account.invoice'].search([])[0].import_billings(self.file)
+        if str(res) == '[[]]':
+            res = "Everything ok"
+        return {
+            'error': str('Import data error. Process interrupted.'),
+            'preview': res,
+        }

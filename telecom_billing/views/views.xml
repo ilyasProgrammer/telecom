@@ -190,16 +190,16 @@
 
         <menuitem action="action_billing_tree22" id="menu_action_billing_tree1" parent="account.menu_finance_receivables" sequence="1"/>
 
-        <record id="view_attachment_form_inherit" model="ir.ui.view">
-            <field name="name">view_attachment_form_inherit.inherit</field>
-            <field name="model">ir.attachment</field>
-            <field name="inherit_id" ref="base.view_attachment_form"/>
-            <field name="arch" type="xml">
-                <field name="mimetype" position="after">
-                    <button name="import_billings" string="Import Telecom Billing" class="oe_highlight" type="object"/>
-                </field>
-            </field>
-        </record>
+        <!--<record id="account.action_invoice_tree" model="ir.actions.act_window">-->
+            <!--<field name="name">Invoices</field>-->
+            <!--<field name="res_model">account.invoice</field>-->
+            <!--<field name="view_type">form</field>-->
+            <!--<field name="view_mode">tree,form,calendar,graph</field>-->
+            <!--<field name="view_id" ref="account.invoice_tree"/>-->
+            <!--<field name="domain">[('is_billing','=',False)]</field>-->
+            <!--<field name="context">{'type':'out_invoice'}</field>-->
+            <!--<field name="search_view_id" ref="account.view_account_invoice_filter"/>-->
+        <!--</record>-->
 
     </data>
 </odoo>
