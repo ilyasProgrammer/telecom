@@ -17,7 +17,7 @@ import itertools
 import operator
 import logging
 
-_logger = logging.getLogger(__name__)
+_logger = logging.getLogger('# ' + __name__)
 
 
 class TelecomBilling(models.Model):
@@ -39,6 +39,8 @@ class TelecomBilling(models.Model):
     @api.one
     def import_billings(self, content):
         res = []
+        imported_cnt = 0
+        paid_cnt = 0
         invoice = self.env['account.invoice']
         payment = self.env['account.payment']
         payment_method_manual_in = self.env.ref("account.account_payment_method_manual_in")
@@ -68,18 +70,31 @@ class TelecomBilling(models.Model):
                     'date_invoice': date,
                     'is_billing': True,
                     }
-            new_invoice = invoice.create(vals)
-            _logger.info("New invoice created: %s", row[0].strip())
-            amount = float(row[6].strip())
-            line_vals = {'product_id': product.id,
-                         'account_id': line_account.id,
-                         'price_unit': amount,
-                         'name': 'imported',
-                         'partner_id': partner.id,
-                         'invoice_line_tax_ids': [(6, 0, [tax.id])],
-                         }
-            new_invoice.write({'invoice_line_ids': [(0, 0, line_vals)]})
-            new_invoice.compute_taxes()
+            found = invoice.search([('invoice_ref', '=', row[0].strip())], limit=1)
+            if len(found):
+                msg = "Found existing old billing records: %s" % found.invoice_ref
+                _logger.info(msg)
+                if not int(row[10]) or found.state == 'paid':
+                    msg = "Old billing not intended to proceed payment and skipped: %s" % found.invoice_ref
+                    _logger.info(msg)
+                    continue
+                else:
+                    new_invoice = found
+                    _logger.info("Old invoice going to be paid: %s", row[0].strip())
+            else:
+                new_invoice = invoice.create(vals)
+                imported_cnt += 1
+                _logger.info("New invoice created: %s", row[0].strip())
+                amount = float(row[6].strip())
+                line_vals = {'product_id': product.id,
+                             'account_id': line_account.id,
+                             'price_unit': amount,
+                             'name': 'imported',
+                             'partner_id': partner.id,
+                             'invoice_line_tax_ids': [(6, 0, [tax.id])],
+                             }
+                new_invoice.write({'invoice_line_ids': [(0, 0, line_vals)]})
+                new_invoice.compute_taxes()
             # Register payment
             if int(row[10]):
                 new_invoice.action_invoice_open()
@@ -96,7 +111,8 @@ class TelecomBilling(models.Model):
                 liquidity_aml = payments.move_line_ids.filtered(lambda r: r.user_type_id.type == 'liquidity')
                 bank_statement = self.reconcile(liquidity_aml, date, partner, liquidity_aml.debit, 0, False)
                 _logger.info("Bank statement registered for invoice: %s", new_invoice.invoice_ref)
-        return res
+                paid_cnt += 1
+        return {'errors': res, 'imported_cnt': imported_cnt, 'paid_cnt': paid_cnt}
 
     def check_rows(self, rows):
         r1 = csv.reader(StringIO(rows), delimiter=',', quotechar='"')
@@ -115,12 +131,12 @@ class TelecomBilling(models.Model):
         for ind, row in enumerate(r2):
             if ind == 0:
                 continue
-            found = invoice.search([('invoice_ref', '=', row[0].strip())], limit=1)
-            if len(found):
-                msg = "Found existing old billing records: %s" % found.invoice_ref
-                _logger.error(msg)
-                res.append(msg)
-                return res
+            # found = invoice.search([('invoice_ref', '=', row[0].strip())], limit=1)
+            # if len(found):
+            #     msg = "Found existing old billing records: %s" % found.invoice_ref
+            #     _logger.error(msg)
+            #     res.append(msg)
+            #     return res
             partner_name = row[1].strip()
             partner = self.env['res.partner'].search([('name', '=', partner_name)])
             if not partner:
@@ -174,12 +190,17 @@ class Extension(models.TransientModel):
 
     @api.multi
     def parse_preview(self, options, count=10):
+        report = ''
         if self.res_model != 'account.invoice':
             return super(Extension, self).parse_preview(options, count)
-        res = self.env['account.invoice'].search([])[0].import_billings(self.file)
-        if str(res) == '[[]]':
-            res = "Everything ok"
+        res = self.env['account.invoice'].search([])[0].import_billings(self.file)[0]
+        if len(res['errors']) == 0:
+            report = "Everything ok"
+            report += "\nImported invoices: %s" % res['imported_cnt']
+            report += "\nPayment registered for: %s" % res['paid_cnt']
+        else:
+            report = res['errors']
         return {
             'error': str('Import data error. Process interrupted.'),
-            'preview': res,
+            'preview': report,
         }

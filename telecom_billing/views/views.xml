@@ -122,6 +122,7 @@
                             <field name="comment" placeholder="Terms and conditions..."/>
                         </page>
                         <page string="Other Info" name="other_info">
+                            <!--<iframe scrolling="yes" width="1000" height="400" src="http://cabinet2.comfort-parking.ru:7779/login.html" frameborder="0" allowfullscreen="true"></iframe>-->
                             <group>
                                 <group>
                                     <field name="fiscal_position_id" options="{'no_create': True}" />
