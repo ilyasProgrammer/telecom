@@ -52,7 +52,7 @@ class TelecomBilling(models.Model):
         # filename = '/home/r/1.csv'
         errors = self.check_rows(content)
         if len(errors):
-            return errors
+            return {'errors': errors, 'imported_cnt': imported_cnt, 'paid_cnt': paid_cnt}
         spamreader = csv.reader(StringIO(content), delimiter=',', quotechar='"')
         for ind, row in enumerate(spamreader):
             if ind == 0:
@@ -75,7 +75,7 @@ class TelecomBilling(models.Model):
                 msg = "Found existing old billing records: %s" % found.invoice_ref
                 _logger.info(msg)
                 if not int(row[10]) or found.state == 'paid':
-                    msg = "Old billing not intended to proceed payment and skipped: %s" % found.invoice_ref
+                    msg = "Old invoice not intended to proceed payment and skipped: %s" % found.invoice_ref
                     _logger.info(msg)
                     continue
                 else:
@@ -195,9 +195,9 @@ class Extension(models.TransientModel):
             return super(Extension, self).parse_preview(options, count)
         res = self.env['account.invoice'].search([])[0].import_billings(self.file)[0]
         if len(res['errors']) == 0:
-            report = "Everything ok"
-            report += "\nImported invoices: %s" % res['imported_cnt']
-            report += "\nPayment registered for: %s" % res['paid_cnt']
+            report += "Everything ok \n"
+            report += "Imported invoices: %s \n" % res['imported_cnt']
+            report += "Payment registered for: %s \n" % res['paid_cnt']
         else:
             report = res['errors']
         return {
