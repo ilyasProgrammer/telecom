@@ -59,13 +59,13 @@ class TelecomBilling(models.Model):
                 continue
             partner_name = row[1].strip()
             partner = self.env['res.partner'].search([('name', '=', partner_name)])
-            product = self.env['product.product'].search([('name', '=', 'Electricity Bill')])
+            product = self.env['product.product'].search([('name', '=', 'Monthly Telecom & Data Bill')])
             date = fields.Datetime.now()
             if len(row[11]):
                 try:
-                    date = datetime.strptime(row[11].strip(), '%d.%m.%y')
+                    date = datetime.strptime(row[11].strip(), '%d/%m/%Y')
                 except:
-                    msg = "Wrong data format in row  %s %s" % (ind, row[11])
+                    msg = "Wrong date format in row: %s content: %s" % (ind, row[11])
                     _logger.info(msg)
             vals = {'partner_id': partner.id,
                     'invoice_ref': row[0].strip(),
@@ -79,7 +79,7 @@ class TelecomBilling(models.Model):
             if len(found):
                 msg = "Found existing old billing records: %s" % found.invoice_ref
                 _logger.info(msg)
-                if not int(row[10]) or found.state == 'paid':
+                if not row[10].strip() == 'Success' or found.state == 'paid':
                     msg = "Old invoice not intended to proceed payment and skipped: %s" % found.invoice_ref
                     _logger.info(msg)
                     continue
@@ -101,7 +101,8 @@ class TelecomBilling(models.Model):
                 new_invoice.write({'invoice_line_ids': [(0, 0, line_vals)]})
                 new_invoice.compute_taxes()
             # Register payment
-            if int(row[10]):
+            if int(row[10].strip() == 'Success'):
+                new_invoice.date_invoice = date  # update date before
                 new_invoice.action_invoice_open()
                 _logger.info("Validated invoice: %s", new_invoice.invoice_ref)
                 ctx = {'active_model': 'account.invoice', 'active_ids': [new_invoice.id]}
