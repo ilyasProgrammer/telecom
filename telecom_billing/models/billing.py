@@ -60,8 +60,13 @@ class TelecomBilling(models.Model):
             partner_name = row[1].strip()
             partner = self.env['res.partner'].search([('name', '=', partner_name)])
             product = self.env['product.product'].search([('name', '=', 'Electricity Bill')])
-            # date = datetime.strptime(row[10].strip(), '%d.%m.%y')
             date = fields.Datetime.now()
+            if len(row[11]):
+                try:
+                    date = datetime.strptime(row[11].strip(), '%d.%m.%y')
+                except:
+                    msg = "Wrong data format in row  %s %s" % (ind, row[11])
+                    _logger.info(msg)
             vals = {'partner_id': partner.id,
                     'invoice_ref': row[0].strip(),
                     'payment_method': row[3].strip(),
