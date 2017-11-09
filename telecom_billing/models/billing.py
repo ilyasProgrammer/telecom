@@ -24,8 +24,8 @@ class TelecomBilling(models.Model):
     _inherit = 'account.invoice'
     is_billing = fields.Boolean('Is billing', default=False)
     invoice_ref = fields.Char(string='Invoice ref')
-    # account_no = fields.Char(related='partner_id.x_account_no')
-    account_no = fields.Char()
+    account_no = fields.Char(related='partner_id.x_account_no')
+    # account_no = fields.Char()
     payment_method = fields.Selection([('Cheque', 'Cheque'),
                                        ('Direct Debit', 'Direct Debit'),
                                        ('Card Payment', 'Card Payment'),
