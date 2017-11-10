@@ -15,7 +15,6 @@ class TelecomBilling(models.Model):
     is_billing = fields.Boolean('Is billing', default=False)
     invoice_ref = fields.Char(string='Invoice ref')
     account_no = fields.Char(related='partner_id.x_account_no')
-    # account_no = fields.Char()
     payment_method = fields.Selection([('Cheque', 'Cheque'),
                                        ('Direct Debit', 'Direct Debit'),
                                        ('Card Payment', 'Card Payment'),
@@ -27,7 +26,7 @@ class TelecomBilling(models.Model):
     ]
 
     @api.one
-    def import_register_payments(self, spamreader):
+    def import_register_payments(self, content):
         paid_cnt = 0
         invoice_model = self.env['account.invoice']
         partner_model = self.env['res.partner']
@@ -35,27 +34,30 @@ class TelecomBilling(models.Model):
         journal_id = self.env['account.journal'].search([('code', '=', 'BNK1')])
         payment_method_manual_in = self.env.ref("account.account_payment_method_manual_in")
         register_payments_model = self.env['account.register.payments']
-        for row in spamreader:
-            partner_id = partner_model.search([('x_account_no', '=', row['Account Number'])])
-            invoice_ids = invoice_model.search([('partner_id', '=', partner_id.id), ('state', '=', 'draft')])
+        reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
+        for row in reader:
+            partner_id = partner_model.search([('is_company', '=', True), ('x_account_no', '=', row['Account Number'])])
+            invoice_ids = invoice_model.search([('partner_id', '=', partner_id.id), ('state', '=', 'open')])
             date = datetime.strptime(row['Date'].strip(), '%d/%m/%Y')
             for inv in invoice_ids:
                 inv.date_invoice = date  # set payment date
-                invoice_ids.action_invoice_open()
-                _logger.info("Validated invoice: %s", inv.invoice_ref)
+                # invoice_ids.action_invoice_open()
+                # _logger.info("Validated invoice: %s", inv.invoice_ref)
             ctx = {'active_model': 'account.invoice', 'active_ids': invoice_ids.ids}
             register_payments = register_payments_model.with_context(ctx).create({
                 'payment_date': date,
                 'journal_id': journal_id.id,
                 'payment_method_id': payment_method_manual_in.id,
+                'amount': float(row['Total']),
             })
             register_payments.create_payment()
-            _logger.info("Payment registered for invoices: %s", invoice_ids.ids)
-            payments = payment_model.search([], order="id desc", limit=1)
-            liquidity_aml = payments.move_line_ids.filtered(lambda r: r.user_type_id.type == 'liquidity')
-            bank_statement = self.reconcile(liquidity_aml, date, partner_id, liquidity_aml.debit, 0, False)
-            _logger.info("Bank statement registered for invoices: %s", invoice_ids.ids)
+            _logger.info("Payment registered for partner %s invoices: %s" % (partner_id.name, invoice_ids.ids))
+            # payments = payment_model.search([], order="id desc", limit=1)
+            # liquidity_aml = payments.move_line_ids.filtered(lambda r: r.user_type_id.type == 'liquidity')
+            # bank_statement = self.reconcile(liquidity_aml, date, partner_id, liquidity_aml.debit, 0, False)
+            # _logger.info("Bank statement registered for invoices: %s", invoice_ids.ids)
             paid_cnt += 1
+        return paid_cnt
 
     @api.one
     def import_billings(self, content):
@@ -63,26 +65,25 @@ class TelecomBilling(models.Model):
         invoice = self.env['account.invoice']
         line_account = self.env['account.account'].search([('name', '=', 'Sales Tax Control Account')])
         account = self.env['account.account'].search([('name', '=', 'Debtors Control Account')])
+        product = self.env['product.product'].search([('name', '=', PRODUCT_NAME)])
         tax = self.env['account.tax'].search([('name', '=', 'S')])[0]
+        reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
         for ind, row in enumerate(reader):
-            if ind == 0:
-                continue
-            partner_name = row[1].strip()
-            partner = self.env['res.partner'].search([('name', '=', partner_name)])
-            product = self.env['product.product'].search([('name', '=', PRODUCT_NAME)])
+            partner_name = row['Site Name'].strip()
+            partner = self.env['res.partner'].search([('is_company', '=', True), ('name', '=', partner_name)])
             date = fields.Datetime.now()
             vals = {'partner_id': partner.id,
-                    'invoice_ref': row[0].strip(),
-                    'payment_method': row[3].strip(),
+                    'invoice_ref': row['Invoice Number'].strip(),
+                    'payment_method': row['Payment Method'].strip(),
                     'account_id': account.id,
-                    'name': row[9].strip(),
+                    'name': row['Period'].strip(),
                     'date_invoice': date,
                     'is_billing': True,
                     }
             new_invoice = invoice.create(vals)
             imported_cnt += 1
-            _logger.info("New invoice created: %s", row[0].strip())
-            amount = float(row[6].strip())
+            _logger.info("New invoice created: %s", row['Invoice Number'].strip())
+            amount = float(row['Service Charges'].strip())
             line_vals = {'product_id': product.id,
                          'account_id': line_account.id,
                          'price_unit': amount,
@@ -119,24 +120,22 @@ class TelecomBilling(models.Model):
         invoice_model = self.env['account.invoice']
         reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
         for row in reader:
-            if row[0] not in ref_numbers:
-                ref_numbers.add(row[0])
+            if row['Invoice Number'] not in ref_numbers:
+                ref_numbers.add(row['Invoice Number'])
             else:
-                duplicated_refs.append(row[0])
+                duplicated_refs.append(row['Invoice Number'])
         if len(duplicated_refs):
             res.append('duplicated refs:' + str(duplicated_refs))
         reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
         for ind, row in enumerate(reader):
-            if ind == 0:
-                continue
-            found = invoice_model.search([('invoice_ref', '=', row[0].strip())], limit=1)
+            found = invoice_model.search([('invoice_ref', '=', row['Invoice Number'].strip())], limit=1)
             if len(found):
                 msg = "Found existing old billing records: %s" % found.invoice_ref
                 _logger.error(msg)
                 res.append(msg)
                 return res
-            partner_name = row[1].strip()
-            partner = self.env['res.partner'].search([('name', '=', partner_name)])
+            partner_name = row['Site Name'].strip()
+            partner = self.env['res.partner'].search([('is_company', '=', True), ('name', '=', partner_name)])
             if not partner:
                 msg = "Partner not found: %s" % partner_name
                 _logger.error(msg)
@@ -150,17 +149,6 @@ class TelecomBilling(models.Model):
             product = self.env['product.product'].search([('name', '=', PRODUCT_NAME)])
             if not product:
                 msg = "Product not found: %s" % PRODUCT_NAME
-                _logger.error(msg)
-                res.append(msg)
-                return res
-            if len(row['Date']):
-                try:
-                    date = datetime.strptime(row['Date'].strip(), '%d/%m/%Y')
-                except:
-                    msg = "Wrong date format in row: %s" % row
-                    _logger.info(msg)
-            else:
-                msg = "Date is absent in row: %s" % row
                 _logger.error(msg)
                 res.append(msg)
                 return res
@@ -178,46 +166,46 @@ class TelecomBilling(models.Model):
             else:
                 duplicated_refs.append(row['Account Number'])
         if len(duplicated_refs):
-            res.append('Duplicated Account Number:' + str(duplicated_refs))
+            res.append('Duplicated Account Number:' + str(duplicated_refs) + '\n')
         reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
-        for row in reader:
+        for ind, row in enumerate(reader):
             if not len(row['Account Number']):
-                msg = "Empty Account Number in row: %s" % row
+                msg = "Line %s. Empty Account Number in row: %s" % row
                 _logger.error(msg)
                 res.append(msg)
                 return res
             x_account_no = row['Account Number'].strip()
-            partner = self.env['res.partner'].search([('x_account_no', '=', x_account_no)])
+            partner = self.env['res.partner'].search([('is_company', '=', True), ('x_account_no', '=', x_account_no)])
             if not partner:
-                msg = "Partner not found: %s" % x_account_no
+                msg = "Line %s. Partner not found: %s \n" % (ind, x_account_no)
                 _logger.error(msg)
                 res.append(msg)
                 return res
             if len(partner) > 1:
-                msg = "More than one partner with same x_account_no: %s" % x_account_no
+                msg = "Line %s. More than one partner with same x_account_no: %s \n" % (ind, x_account_no)
                 _logger.error(msg)
                 res.append(msg)
                 return res
-            invoice_ids = invoice_model.search([('partner_id', '=', partner.id), ('state', '=', 'draft')])
+            invoice_ids = invoice_model.search([('partner_id', '=', partner.id), ('state', '=', 'open')])
             if len(invoice_ids) == 0:
-                msg = "There is no draft invoices for partner %s in line %s" % (partner.name, row)
+                msg = "Line %s. There is no open invoices for partner %s \n" % (ind, partner.name)
                 _logger.error(msg)
                 res.append(msg)
                 return res
             product = self.env['product.product'].search([('name', '=', PRODUCT_NAME)])
             if not product:
-                msg = "Product not found: %s" % PRODUCT_NAME
+                msg = "Line %s. Product not found: %s \n" % (ind, PRODUCT_NAME)
                 _logger.error(msg)
                 res.append(msg)
                 return res
             if len(row['Total']):
                 if float(row['Total']) <= 0:
-                    msg = "Total is less that 0 for x_account_no: %s" % x_account_no
+                    msg = "Line %s. Total is less that 0 for x_account_no: %s \n" % (ind, x_account_no)
                     _logger.error(msg)
                     res.append(msg)
                     return res
             else:
-                msg = "Total is absent for x_account_no: %s" % x_account_no
+                msg = "Line %s. Total is absent for x_account_no: %s \n" % (ind, x_account_no)
                 _logger.error(msg)
                 res.append(msg)
                 return res
@@ -225,19 +213,19 @@ class TelecomBilling(models.Model):
                 try:
                     date = datetime.strptime(row['Date'].strip(), '%d/%m/%Y')
                 except:
-                    msg = "Wrong date format for x_account_no: %s" % x_account_no
+                    msg = "Line %s. Wrong date format: %s \n" % (ind, row['Date'])
                     _logger.info(msg)
             else:
-                msg = "Date is absent for x_account_no: %s" % x_account_no
+                msg = "Line %s. Date is absent. \n" % ind
                 _logger.error(msg)
                 res.append(msg)
                 return res
             if len(row['Paid']):
                 if row['Paid'] != 'Success':
-                    msg = "No Success for x_account_no: %s" % x_account_no
+                    msg = "Line %s. No Success. \n" % ind
                     _logger.info(msg)
             else:
-                msg = "Empty Paid field for x_account_no: %s" % x_account_no
+                msg = "Line %s. Empty Paid field. \n" % ind
                 _logger.error(msg)
                 res.append(msg)
                 return res
@@ -260,7 +248,6 @@ class TelecomBilling(models.Model):
             'currency_id': currency_id,
             'date': date
         })
-
         amount_in_widget = currency_id and amount_currency or amount
         bank_stmt_line.process_reconciliation(payment_aml_rec=liquidity_aml)
         return bank_stmt
