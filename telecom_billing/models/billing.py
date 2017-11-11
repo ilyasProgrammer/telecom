@@ -37,7 +37,7 @@ class TelecomBilling(models.Model):
         reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
         for row in reader:
             partner_id = partner_model.search([('is_company', '=', True), ('x_account_no', '=', row['Account Number'])])
-            invoice_ids = invoice_model.search([('partner_id', '=', partner_id.id), ('state', '=', 'open')])
+            invoice_ids = invoice_model.search([('is_billing', '=', True), ('partner_id', '=', partner_id.id), ('state', '=', 'open')])
             date = datetime.strptime(row['Date'].strip(), '%d/%m/%Y')
             for inv in invoice_ids:
                 inv.date_invoice = date  # set payment date
@@ -160,13 +160,13 @@ class TelecomBilling(models.Model):
         duplicated_refs = []
         invoice_model = self.env['account.invoice']
         reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
-        for row in reader:
-            if row['Account Number'] not in ref_numbers:
-                ref_numbers.add(row['Account Number'])
-            else:
-                duplicated_refs.append(row['Account Number'])
-        if len(duplicated_refs):
-            res.append('Duplicated Account Number:' + str(duplicated_refs) + '\n')
+        # for row in reader:
+        #     if row['Account Number'] not in ref_numbers:
+        #         ref_numbers.add(row['Account Number'])
+        #     else:
+        #         duplicated_refs.append(row['Account Number'])
+        # if len(duplicated_refs):
+        #     res.append('Duplicated Account Number:' + str(duplicated_refs) + '\n')
         reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
         for ind, row in enumerate(reader):
             if not len(row['Account Number']):
@@ -186,7 +186,7 @@ class TelecomBilling(models.Model):
                 _logger.error(msg)
                 res.append(msg)
                 return res
-            invoice_ids = invoice_model.search([('partner_id', '=', partner.id), ('state', '=', 'open')])
+            invoice_ids = invoice_model.search([('is_billing', '=', True), ('partner_id', '=', partner.id), ('state', '=', 'open')])
             if len(invoice_ids) == 0:
                 msg = "Line %s. There is no open invoices for partner %s \n" % (ind, partner.name)
                 _logger.error(msg)
