@@ -72,6 +72,12 @@ class TelecomBilling(models.Model):
             partner_name = row['Site Name'].strip()
             partner = self.env['res.partner'].search([('is_company', '=', True), ('name', '=', partner_name)])
             date = fields.Datetime.now()
+            if len(row['Date'].strip()):
+                try:
+                    date = datetime.strptime(row['Date'].strip(), '%d/%m/%Y')
+                except:
+                    msg = "Line %s. Wrong date format: %s \n" % (ind, row['Date'])
+                    _logger.info(msg)
             vals = {'partner_id': partner.id,
                     'invoice_ref': row['Invoice Number'].strip(),
                     'payment_method': row['Payment Method'].strip(),
@@ -105,7 +111,7 @@ class TelecomBilling(models.Model):
             errors = self.check_payments_rows(content)
             if len(errors) == 0:
                 paid_cnt = self.import_register_payments(content)
-        elif ln == 10:  # importing billings without payments
+        elif ln == 11:  # importing billings without payments
             errors = self.check_import_rows(content)
             if len(errors) == 0:
                 imported_cnt = self.import_billings(content)
