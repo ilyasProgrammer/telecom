@@ -20,6 +20,7 @@
         'views/views.xml',
         'cron.xml'
     ],
+    "init_xml": ["init.xml"],
     'demo': [
     ],
     'installable': True,

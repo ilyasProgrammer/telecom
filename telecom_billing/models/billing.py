@@ -14,6 +14,7 @@ class TelecomBilling(models.Model):
     _inherit = 'account.invoice'
     is_billing = fields.Boolean('Is billing', default=False)
     invoice_ref = fields.Char(string='Invoice ref')
+    # cooode = fields.Char(string='Invoice ref')
     account_no = fields.Char(related='partner_id.x_account_no')
     payment_method = fields.Selection([('Cheque', 'Cheque'),
                                        ('Direct Debit', 'Direct Debit'),
@@ -116,7 +117,7 @@ class TelecomBilling(models.Model):
             if len(errors) == 0:
                 imported_cnt = self.import_billings(content)
         else:
-            errors.append('Wrong amount of columns in file. Expected 4 or 10. Got %s' % ln)
+            errors.append('Wrong amount of columns in file. Expected 4 or 11. Got %s' % ln)
         return {'errors': errors, 'imported_cnt': imported_cnt, 'paid_cnt': paid_cnt}
 
     def check_import_rows(self, content):
@@ -162,10 +163,10 @@ class TelecomBilling(models.Model):
 
     def check_payments_rows(self, content):
         res = []
-        ref_numbers = set()
-        duplicated_refs = []
         invoice_model = self.env['account.invoice']
-        reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
+        # ref_numbers = set()
+        # duplicated_refs = []
+        # reader = csv.DictReader(StringIO(content), delimiter=',', quotechar='"')
         # for row in reader:
         #     if row['Account Number'] not in ref_numbers:
         #         ref_numbers.add(row['Account Number'])
